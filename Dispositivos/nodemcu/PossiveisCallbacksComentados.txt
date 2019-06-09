@@ -1,0 +1,40 @@
+
+/* callback responsavel por tratar o feed do ac */                               //Manda os comandos IR de ligar e desligar.
+/*
+void ac_callback(char *data, uint16_t len) {
+  String comando= data;
+
+  Serial.print("Comando para o AC: ");
+  Serial.println(comando);
+
+  if(comando=="1"){
+    uint16_t liga_ac[59] = {8450,4200, 600,1550, 600,500, 600,500, 600,500, 550,1600, 600,500, 600,500, 600,500, 550,550, 550,500, 600,500, 600,500, 600,500, 550,550, 550,550, 550,500, 600,500, 600,500, 600,1550, 600,1600, 550,550, 550,550, 550,1600, 600,500, 550,550, 550,1600, 600,500, 600,1600, 550};  // LG 8800325
+    irsend.sendRaw(liga_ac, 59, 38);  // Send a raw data capture at 38kHz.
+  }
+  else if(comando=="0"){
+    uint16_t desliga_ac[59] = {8450,4200, 600,1600, 550,500, 600,500, 600,500, 600,1600, 550,500, 600,500, 600,500, 600,1600, 550,1600, 600,500, 550,550, 550,500, 600,500, 600,500, 600,500, 550,550, 550,550, 550,500, 600,500, 600,500, 600,1550, 600,500, 600,1600, 550,550, 550,500, 600,500, 600,1600, 550};  // LG 88C0051
+    irsend.sendRaw(desliga_ac, 59, 38);  // Send a raw data capture at 38kHz.
+  }
+}
+*/
+/*
+void checa_sensor_de_presenca(){
+
+  if (digitalRead(PINO_SENSORES) == LOW){
+    timer1 = millis(); //Zera o timer
+    Serial.println("Há movimento na sala");
+  }
+
+  if(millis() - timer1 > tempo_de_espera_do_sensor){ //Hora de desligar AC e iluminação
+    Serial.println("Sem movimento na sala, desligando AC e LUZ");
+
+    uint16_t desliga_ac[59] = {8450,4200, 600,1600, 550,500, 600,500, 600,500, 600,1600, 550,500, 600,500, 600,500, 600,1600, 550,1600, 600,500, 550,550, 550,500, 600,500, 600,500, 600,500, 550,550, 550,550, 550,500, 600,500, 600,500, 600,1550, 600,500, 600,1600, 550,550, 550,500, 600,500, 600,1600, 550};  // LG 88C0051
+    irsend.sendRaw(desliga_ac, 59, 38);  // Send a raw data capture at 38kHz.
+
+     if(digitalRead(PINO_SENSOR_DE_TENSAO)){ //Se ler 1 do sensor de tensão, desliga caso contrário já está desligada
+      saida_luz= !saida_luz;
+      digitalWrite(PINO_LUZ,saida_luz);    }
+
+  }
+}
+*/
