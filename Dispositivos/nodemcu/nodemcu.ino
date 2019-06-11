@@ -12,8 +12,8 @@
 #define ARDUINO
 #include <Arduino.h>
 #endif
-#include <IRremoteESP8266.h>
-#include <IRsend.h>
+//#include <IRremoteESP8266.h>
+//#include <IRsend.h>
 
 //INFORMAÇÕES PARA O IR
 //const uint16_t kIrLed = 4;     // ESP8266 GPIO pin to use. Recommended: 4 (D2).
@@ -22,29 +22,28 @@
 void inicia_pinos();
 void conectar_wifi();
 
-MQTTManager manager;
+MQTTManager *manager = NULL;
 
 void setup() {
 
     //Serial.begin(115200);
 
     //irsend.begin();
-
+    //Serial.begin(9600);
     Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
-
     inicia_pinos();
     conectar_wifi();
-    manager.initMQTT();
+    manager = new MQTTManager();
+    manager->initMQTT();
 
 }
-
-void loop() {
+void loop() {  
   //  checa_sensor_de_presenca();
-  manager.checaTimerCafe();
+  manager->checaTimerCafe();
 
   if(WiFi.status()== WL_CONNECTED){ // Se o Wi-Fi estiver conectado...
-    manager.conectarBroker();              //Testa se já está conectado e conecta caso não esteja
-    manager.enviaTeH();
+    manager->conectarBroker();              //Testa se já está conectado e conecta caso não esteja
+    manager->enviaTeH();
   }
 
   else{  conectar_wifi();  }
@@ -65,7 +64,7 @@ void inicia_pinos(){
 
 //Conexão com a rede Wi-Fi
 void conectar_wifi(){
-    WiFiManager wifiManager;
-    wifiManager.autoConnect("AutoConnectAP");
-    Serial.println("connected...yeey :)");
+  WiFiManager wifiManager;
+  wifiManager.autoConnect("AutoConnectAP");
+  Serial.println("connected...yeey :)");
 }

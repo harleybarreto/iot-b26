@@ -10,6 +10,10 @@
 
 bool MQTTManager::saida_luz = HIGH;
 int MQTTManager::timer2 = 0;
+const char*  MQTTManager::AIO_SERVER =  "192.168.0.5";
+const int MQTTManager::AIO_SERVERPORT = 1883;
+const char* MQTTManager::AIO_USERNAME = "";
+const char* MQTTManager::AIO_KEY = "";
 
 MQTTManager::MQTTManager(){
     client = new WiFiClient();
@@ -22,6 +26,7 @@ MQTTManager::MQTTManager(){
     createSubscribeOrNot(&_ac, "ac", MQTT_SUBSCRIBE);
     createSubscribeOrNot(&_luz, "luz", MQTT_SUBSCRIBE);
     createSubscribeOrNot(&_tomada, "tomada", MQTT_SUBSCRIBE);
+    Serial.print("sobrevivi");
 }
 
 MQTTManager::~MQTTManager()
@@ -70,17 +75,18 @@ void MQTTManager::initMQTT() {
 
 template <class T>
 void MQTTManager::createSubscribeOrNot(T** object, char* name,int mode) {
-    char *path;
+    char path[50] = "\0";
     strcat(path, AIO_USERNAME);
     strcat(path, "/b26/");
     strcat(path, name);
+    
     if(mode == 0){
         Adafruit_MQTT_Publish **publish = reinterpret_cast<Adafruit_MQTT_Publish **>(object);
-        *publish = (Adafruit_MQTT_Publish *) malloc(sizeof(Adafruit_MQTT_Publish *));
+        *publish = (Adafruit_MQTT_Publish *) malloc(sizeof(Adafruit_MQTT_Publish));
         **publish = Adafruit_MQTT_Publish(mqtt, path, MQTT_QOS_1);
     }else if(mode == 1) {
         Adafruit_MQTT_Subscribe **subscribe = reinterpret_cast<Adafruit_MQTT_Subscribe **>(object);
-        *subscribe = (Adafruit_MQTT_Subscribe *) malloc(sizeof(Adafruit_MQTT_Subscribe *));
+        *subscribe = (Adafruit_MQTT_Subscribe *) malloc(sizeof(Adafruit_MQTT_Subscribe));
         **subscribe = Adafruit_MQTT_Subscribe(mqtt, path, MQTT_QOS_1);
     }
 }

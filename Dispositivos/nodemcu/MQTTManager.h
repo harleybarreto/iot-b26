@@ -40,5 +40,11 @@ class MQTTManager {
 
         const int tempoProCafe = 1000 * 60 * 2; //2 minutos pra fazer o café
         int contadorCafe = 0; //contador usado na hora de enviar a temperatura
+
+        //INFORMAÇÕES SOBRE O BROKER MQTT
+        const static char*  AIO_SERVER;
+        const static int AIO_SERVERPORT;
+        const static char* AIO_USERNAME;
+        const static char* AIO_KEY;
 };
 #endif

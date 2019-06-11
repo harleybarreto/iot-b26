@@ -11,9 +11,4 @@
 #define PINO_PORTA 13            //Pino D7
 #define PINO_SENSOR_DE_TENSAO 15 //Pino D8
 
-//INFORMAÇÕES SOBRE O BROKER MQTT
-#define AIO_SERVER "192.168.0.5"
-#define AIO_SERVERPORT 1883
-#define AIO_USERNAME ""
-#define AIO_KEY ""
 #endif
