@@ -29,7 +29,7 @@ class MQTTManager {
         DHT *dht;
 
         template <class T>
-        void createSubscribeOrNot(T **object, char* name, int mode = 1);
+        void createSubscribeOrNot(T **object, const char* name, int mode = 1);
 
         static void portaCallback(char *data, uint16_t len);
         static void luzCallback(char *data, uint16_t len);
@@ -39,7 +39,7 @@ class MQTTManager {
         static bool saida_luz;
 
         const int tempoProCafe = 1000 * 60 * 2; //2 minutos pra fazer o café
-        int contadorCafe = 0; //contador usado na hora de enviar a temperatura
+        int contadorCafe = 10; //contador usado na hora de enviar a temperatura
 
         //INFORMAÇÕES SOBRE O BROKER MQTT
         const static char*  AIO_SERVER;

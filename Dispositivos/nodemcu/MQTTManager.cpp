@@ -20,12 +20,13 @@ MQTTManager::MQTTManager(){
     mqtt = new Adafruit_MQTT_Client(client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
     dht = new DHT(dht_dpin, DHTTYPE);
     dht->begin();
-    createSubscribeOrNot(&_temp, "temperatura", MQTT_PUBLISH);
-    createSubscribeOrNot(&_humi, "umidade", MQTT_PUBLISH);
-    createSubscribeOrNot(&_porta, "porta", MQTT_SUBSCRIBE);
-    createSubscribeOrNot(&_ac, "ac", MQTT_SUBSCRIBE);
-    createSubscribeOrNot(&_luz, "luz", MQTT_SUBSCRIBE);
-    createSubscribeOrNot(&_tomada, "tomada", MQTT_SUBSCRIBE);
+    
+    createSubscribeOrNot(&_humi, "/b26/umidade", MQTT_PUBLISH);
+    createSubscribeOrNot(&_porta, "/b26/porta", MQTT_SUBSCRIBE);
+    createSubscribeOrNot(&_ac, "/b26/ac", MQTT_SUBSCRIBE);
+    createSubscribeOrNot(&_luz, "/b26/luz", MQTT_SUBSCRIBE);
+    createSubscribeOrNot(&_tomada, "/b26/tomada", MQTT_SUBSCRIBE);
+    createSubscribeOrNot(&_temp, "/b26/temperatura", MQTT_PUBLISH);
     Serial.print("sobrevivi");
 }
 
@@ -59,9 +60,9 @@ void MQTTManager::conectarBroker() {
             ESP.restart();
         }
     } //Depois que esgotar o número de tentivas, reseta o NodeMCU
+    Serial.println("Conectado ao broker com sucesso!");
 }
 
-typedef void (*callbackFunc)(char *, uint16_t);
 void MQTTManager::initMQTT() {
     _porta->setCallback(MQTTManager::portaCallback);
     mqtt->subscribe(_porta);
@@ -74,12 +75,7 @@ void MQTTManager::initMQTT() {
 }
 
 template <class T>
-void MQTTManager::createSubscribeOrNot(T** object, char* name,int mode) {
-    char path[50] = "\0";
-    strcat(path, AIO_USERNAME);
-    strcat(path, "/b26/");
-    strcat(path, name);
-    
+void MQTTManager::createSubscribeOrNot(T** object, const char* path,int mode) {
     if(mode == 0){
         Adafruit_MQTT_Publish **publish = reinterpret_cast<Adafruit_MQTT_Publish **>(object);
         *publish = (Adafruit_MQTT_Publish *) malloc(sizeof(Adafruit_MQTT_Publish));
@@ -103,10 +99,13 @@ void MQTTManager::enviaTeH() {
         float h = dht->readHumidity();
         float t = dht->readTemperature();
 
-        if (! _temp->publish(t)) {  Serial.println("Falha ao enviar a temperatura."); }
-        Serial.println("Temperatura enviada!"); Serial.println(t);
-        if (! _humi->publish(h)) {  Serial.println("Falha ao enviar a umidade."); }
-        Serial.println("Umidade enviada!"); Serial.println(h);
+        if (! _temp->publish(t)) {  Serial.println("Falha ao enviar a temperatura."); }  else {
+          Serial.println("Temperatura enviada!"); Serial.println(t);
+          }
+        
+        if (! _humi->publish(h)) {  Serial.println("Falha ao enviar a umidade."); } else {
+          Serial.println("Umidade enviada!"); Serial.println(h);}
+        
 
         contadorCafe = 0;
 
