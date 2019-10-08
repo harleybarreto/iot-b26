@@ -18,6 +18,7 @@ class MQTTManager {
         void initMQTT(void);
         
         void checaTimerCafe();
+        void checaPresenca();
         void enviaTeH();
     private:
         WiFiClient *client;
@@ -34,9 +35,15 @@ class MQTTManager {
         static void portaCallback(char *data, uint16_t len);
         static void luzCallback(char *data, uint16_t len);
         static void tomadaCallback(char *data, uint16_t len);
+        static void ac_Callback(char *data, uint16_t len);
 
         static int timer2;
         static bool saida_luz;
+
+        // Variables will change:
+
+        int presencaState = 0;         // current state of the sensor
+        int lastpresencaState = 0;     // previous state of the sensor
 
         const int tempoProCafe = 1000 * 60 * 2; //2 minutos pra fazer o café
         int contadorCafe = 10; //contador usado na hora de enviar a temperatura

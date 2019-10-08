@@ -15,6 +15,8 @@ const int MQTTManager::AIO_SERVERPORT = 1883;
 const char* MQTTManager::AIO_USERNAME = "";
 const char* MQTTManager::AIO_KEY = "";
 
+
+
 MQTTManager::MQTTManager(){
     client = new WiFiClient();
     mqtt = new Adafruit_MQTT_Client(client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
@@ -66,8 +68,8 @@ void MQTTManager::conectarBroker() {
 void MQTTManager::initMQTT() {
     _porta->setCallback(MQTTManager::portaCallback);
     mqtt->subscribe(_porta);
-    //  _ac.setCallback(ac_callback);
-    //  mqtt.subscribe(&_ac);
+    _ac->setCallback(MQTTManager::ac_Callback);
+    mqtt->subscribe(_ac);
     _luz->setCallback(MQTTManager::luzCallback);
     mqtt->subscribe(_luz);
     _tomada->setCallback(MQTTManager::tomadaCallback);
@@ -92,6 +94,24 @@ void MQTTManager::checaTimerCafe() {
         digitalWrite(PINO_TOMADA,HIGH);
         timer2=0;
     }
+}
+
+void MQTTManager::checaPresenca() {
+presencaState = digitalRead(PINO_SENSORES);
+Serial.println(presencaState);
+
+  // compare the sensor state to its previous state
+  if (presencaState != lastpresencaState) {
+    // if the state has changed, increment the counter
+    if (presencaState == HIGH) {
+      Serial.println("O sensor foi ativado");
+    } else {
+      // if the current state is LOW then the button went from on to off:
+      Serial.println("O sensor voltou a posicao normal");
+    }
+
+  lastpresencaState = presencaState;
+}
 }
 
 void MQTTManager::enviaTeH() {
@@ -123,6 +143,23 @@ void MQTTManager::portaCallback(char *data, uint16_t len) {
         digitalWrite(PINO_PORTA, LOW);
         delay(500);
         digitalWrite(PINO_PORTA, HIGH);
+    }
+}
+
+void MQTTManager::ac_Callback(char *data, uint16_t len) {
+    String comando = data;
+
+    Serial.print("Comando para o ar: ");
+    Serial.println(comando);
+
+    if (comando == "1") {
+//      uint16_t liga_ac[59] = {8450,4200, 600,1550, 600,500, 600,500, 600,500, 550,1600, 600,500, 600,500, 600,500, 550,550, 550,500, 600,500, 600,500, 600,500, 550,550, 550,550, 550,500, 600,500, 600,500, 600,1550, 600,1600, 550,550, 550,550, 550,1600, 600,500, 550,550, 550,1600, 600,500, 600,1600, 550};  // LG 8800325
+//      irsend.sendRaw(liga_ac, 59, 38);  // Send a raw data capture at 38kHz.
+  
+    }
+    else if (comando == "0"){
+//      uint16_t desliga_ac[59] = {8450,4200, 600,1600, 550,500, 600,500, 600,500, 600,1600, 550,500, 600,500, 600,500, 600,1600, 550,1600, 600,500, 550,550, 550,500, 600,500, 600,500, 600,500, 550,550, 550,550, 550,500, 600,500, 600,500, 600,1550, 600,500, 600,1600, 550,550, 550,500, 600,500, 600,1600, 550};  // LG 88C0051
+//      irsend.sendRaw(desliga_ac, 59, 38);  // Send a raw data capture at 38kHz.
     }
 }
 void MQTTManager::luzCallback(char *data, uint16_t len) {

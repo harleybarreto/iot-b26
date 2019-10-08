@@ -12,12 +12,12 @@
 #define ARDUINO
 #include <Arduino.h>
 #endif
-//#include <IRremoteESP8266.h>
-//#include <IRsend.h>
+#include <IRremoteESP8266.h>
+#include <IRsend.h>
 
 //INFORMAÇÕES PARA O IR
-//const uint16_t kIrLed = 4;     // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-//IRsend irsend(kIrLed);         // Set the GPIO to be used to sending the message.
+const uint16_t kIrLed = 4;     // ESP8266 GPIO pin to use. Recommended: 4 (D2).
+IRsend irsend(kIrLed);         // Set the GPIO to be used to sending the message.
 
 void inicia_pinos();
 void conectar_wifi();
@@ -27,10 +27,11 @@ MQTTManager *manager = NULL;
 void setup() {
 
     //Serial.begin(115200);
-
-    //irsend.begin();
-    //Serial.begin(9600);
     Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
+
+    irsend.begin();
+    //Serial.begin(9600);
+
     inicia_pinos();
     conectar_wifi();
     manager = new MQTTManager();
@@ -38,7 +39,7 @@ void setup() {
 
 }
 void loop() {  
-  //  checa_sensor_de_presenca();
+  manager->checaPresenca();
   manager->checaTimerCafe();
 
   if(WiFi.status()== WL_CONNECTED){ // Se o Wi-Fi estiver conectado...
