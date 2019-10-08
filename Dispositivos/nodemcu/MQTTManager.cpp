@@ -22,6 +22,11 @@ MQTTManager::MQTTManager(){
     mqtt = new Adafruit_MQTT_Client(client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
     dht = new DHT(dht_dpin, DHTTYPE);
     dht->begin();
+
+    //INFORMAÇÕES PARA O IR
+    irSend->begin();
+    const uint16_t kIrLed = 4;     // ESP8266 GPIO pin to use. Recommended: 4 (D2).
+    IRsend irSend(kIrLed);         // Set the GPIO to be used to sending the message.
     
     createSubscribeOrNot(&_humi, "/b26/umidade", MQTT_PUBLISH);
     createSubscribeOrNot(&_porta, "/b26/porta", MQTT_SUBSCRIBE);
@@ -29,12 +34,12 @@ MQTTManager::MQTTManager(){
     createSubscribeOrNot(&_luz, "/b26/luz", MQTT_SUBSCRIBE);
     createSubscribeOrNot(&_tomada, "/b26/tomada", MQTT_SUBSCRIBE);
     createSubscribeOrNot(&_temp, "/b26/temperatura", MQTT_PUBLISH);
+    createSubscribeOrNot(&_presenca, "/b26/presenca", MQTT_PUBLISH);
     Serial.print("sobrevivi");
 }
 
-MQTTManager::~MQTTManager()
-{
-    delete client, mqtt, _temp, _humi, _porta, _ac, _luz, _tomada;
+MQTTManager::~MQTTManager(){
+    delete client, mqtt, _temp, _humi, _porta, _ac, _luz, _tomada, _presenca;
 }
 
 void MQTTManager::conectarBroker() {
@@ -97,21 +102,29 @@ void MQTTManager::checaTimerCafe() {
 }
 
 void MQTTManager::checaPresenca() {
-presencaState = digitalRead(PINO_SENSORES);
-Serial.println(presencaState);
+    presencaState = digitalRead(PINO_SENSORES);
+    Serial.println(presencaState);
 
-  // compare the sensor state to its previous state
-  if (presencaState != lastpresencaState) {
-    // if the state has changed, increment the counter
-    if (presencaState == HIGH) {
-      Serial.println("O sensor foi ativado");
-    } else {
-      // if the current state is LOW then the button went from on to off:
-      Serial.println("O sensor voltou a posicao normal");
+    // compare the sensor state to its previous state
+    if (presencaState != lastpresencaState) {
+        // if the state has changed, increment the counter
+        if (presencaState == HIGH) {
+            Serial.println("O sensor foi ativado");
+            if (! _presenca->publish(presencaState)) {  
+                Serial.println("Falha ao enviar o estado do sensor."); 
+            }  
+            else {
+            Serial.println("Estado do sensor enviado!"); 
+            }
+        } 
+        
+        else {
+        // if the current state is LOW then the button went from on to off:
+        Serial.println("O sensor voltou a posicao normal");
+        }
+
+    lastpresencaState = presencaState;
     }
-
-  lastpresencaState = presencaState;
-}
 }
 
 void MQTTManager::enviaTeH() {
@@ -119,12 +132,19 @@ void MQTTManager::enviaTeH() {
         float h = dht->readHumidity();
         float t = dht->readTemperature();
 
-        if (! _temp->publish(t)) {  Serial.println("Falha ao enviar a temperatura."); }  else {
+        if (! _temp->publish(t)) {  
+            Serial.println("Falha ao enviar a temperatura."); 
+        }  
+        else {
           Serial.println("Temperatura enviada!"); Serial.println(t);
-          }
+        }
         
-        if (! _humi->publish(h)) {  Serial.println("Falha ao enviar a umidade."); } else {
-          Serial.println("Umidade enviada!"); Serial.println(h);}
+        if (! _humi->publish(h)) {  
+            Serial.println("Falha ao enviar a umidade."); 
+        } 
+        else {
+          Serial.println("Umidade enviada!"); Serial.println(h);
+        }
         
 
         contadorCafe = 0;
@@ -153,13 +173,12 @@ void MQTTManager::ac_Callback(char *data, uint16_t len) {
     Serial.println(comando);
 
     if (comando == "1") {
-//      uint16_t liga_ac[59] = {8450,4200, 600,1550, 600,500, 600,500, 600,500, 550,1600, 600,500, 600,500, 600,500, 550,550, 550,500, 600,500, 600,500, 600,500, 550,550, 550,550, 550,500, 600,500, 600,500, 600,1550, 600,1600, 550,550, 550,550, 550,1600, 600,500, 550,550, 550,1600, 600,500, 600,1600, 550};  // LG 8800325
-//      irsend.sendRaw(liga_ac, 59, 38);  // Send a raw data capture at 38kHz.
-  
+      uint16_t liga_ac[59] = {8450,4200, 600,1550, 600,500, 600,500, 600,500, 550,1600, 600,500, 600,500, 600,500, 550,550, 550,500, 600,500, 600,500, 600,500, 550,550, 550,550, 550,500, 600,500, 600,500, 600,1550, 600,1600, 550,550, 550,550, 550,1600, 600,500, 550,550, 550,1600, 600,500, 600,1600, 550};  // LG 8800325
+      irSend->sendRaw(liga_ac, 59, 38);  // Send a raw data capture at 38kHz.
     }
     else if (comando == "0"){
-//      uint16_t desliga_ac[59] = {8450,4200, 600,1600, 550,500, 600,500, 600,500, 600,1600, 550,500, 600,500, 600,500, 600,1600, 550,1600, 600,500, 550,550, 550,500, 600,500, 600,500, 600,500, 550,550, 550,550, 550,500, 600,500, 600,500, 600,1550, 600,500, 600,1600, 550,550, 550,500, 600,500, 600,1600, 550};  // LG 88C0051
-//      irsend.sendRaw(desliga_ac, 59, 38);  // Send a raw data capture at 38kHz.
+      uint16_t desliga_ac[59] = {8450,4200, 600,1600, 550,500, 600,500, 600,500, 600,1600, 550,500, 600,500, 600,500, 600,1600, 550,1600, 600,500, 550,550, 550,500, 600,500, 600,500, 600,500, 550,550, 550,550, 550,500, 600,500, 600,500, 600,1550, 600,500, 600,1600, 550,550, 550,500, 600,500, 600,1600, 550};  // LG 88C0051
+      irSend->sendRaw(desliga_ac, 59, 38);  // Send a raw data capture at 38kHz.
     }
 }
 void MQTTManager::luzCallback(char *data, uint16_t len) {

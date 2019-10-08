@@ -7,17 +7,14 @@
 #include <WiFiManager.h>         //https://github.com/tzapu/WiFiManager
 
 //Bibliotecas pro infravermelho
-
+/*
 #ifndef ARDUINO
 #define ARDUINO
 #include <Arduino.h>
 #endif
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
-
-//INFORMAÇÕES PARA O IR
-const uint16_t kIrLed = 4;     // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-IRsend irsend(kIrLed);         // Set the GPIO to be used to sending the message.
+*/
 
 void inicia_pinos();
 void conectar_wifi();
@@ -28,9 +25,6 @@ void setup() {
 
     //Serial.begin(115200);
     Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
-
-    irsend.begin();
-    //Serial.begin(9600);
 
     inicia_pinos();
     conectar_wifi();

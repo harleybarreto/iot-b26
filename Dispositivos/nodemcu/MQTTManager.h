@@ -10,6 +10,14 @@
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
 
+//Bibliotecas pro infravermelho
+#ifndef ARDUINO
+#define ARDUINO
+#include <Arduino.h>
+#endif
+#include <IRremoteESP8266.h>
+#include <IRsend.h>
+
 class MQTTManager {
     public:
         MQTTManager();
@@ -23,8 +31,10 @@ class MQTTManager {
     private:
         WiFiClient *client;
         Adafruit_MQTT_Client *mqtt;
-        Adafruit_MQTT_Publish *_temp, *_humi;
+        Adafruit_MQTT_Publish *_temp, *_humi, *_presenca;
         Adafruit_MQTT_Subscribe *_porta, *_ac, *_luz, *_tomada;
+
+        IRsend *irSend;
 
         //INFORMAÇÕES PARA O DHT11
         DHT *dht;
