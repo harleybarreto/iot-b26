@@ -24,9 +24,9 @@ MQTTManager::MQTTManager(){
     dht->begin();
 
     //INFORMAÇÕES PARA O IR
-    irSend->begin();
     const uint16_t kIrLed = 4;     // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-    IRsend irSend(kIrLed);         // Set the GPIO to be used to sending the message.
+    irSend = new IRSend(kIrLed);         // Set the GPIO to be used to sending the message.
+    irSend->begin();
     
     createSubscribeOrNot(&_humi, "/b26/umidade", MQTT_PUBLISH);
     createSubscribeOrNot(&_porta, "/b26/porta", MQTT_SUBSCRIBE);
