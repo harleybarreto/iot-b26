@@ -34,7 +34,7 @@ class MQTTManager {
         Adafruit_MQTT_Publish *_temp, *_humi, *_presenca;
         Adafruit_MQTT_Subscribe *_porta, *_ac, *_luz, *_tomada;
 
-        IRsend *irSend;
+        //IRsend *irSend;
 
         //INFORMAÇÕES PARA O DHT11
         DHT *dht;

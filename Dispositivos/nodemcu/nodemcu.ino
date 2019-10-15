@@ -35,6 +35,7 @@ void setup() {
 void loop() {  
   manager->checaPresenca();
   manager->checaTimerCafe();
+  Serial.println(analogRead(A0));
 
   if(WiFi.status()== WL_CONNECTED){ // Se o Wi-Fi estiver conectado...
     manager->conectarBroker();              //Testa se já está conectado e conecta caso não esteja
@@ -51,6 +52,7 @@ void inicia_pinos(){
   pinMode(PINO_PORTA, OUTPUT);
   pinMode(PINO_SENSOR_DE_TENSAO,INPUT);
   pinMode(PINO_SENSORES,INPUT);
+  pinMode(A0, INPUT);
 
   digitalWrite(PINO_LUZ,HIGH);
   digitalWrite(PINO_TOMADA,HIGH);

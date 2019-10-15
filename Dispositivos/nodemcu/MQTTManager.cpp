@@ -24,9 +24,9 @@ MQTTManager::MQTTManager(){
     dht->begin();
 
     //INFORMAÇÕES PARA O IR
-    const uint16_t kIrLed = 4;     // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-    irSend = new irSend(kIrLed);         // Set the GPIO to be used to sending the message.
-    irSend->begin();
+    //const uint16_t kIrLed = 4;     // ESP8266 GPIO pin to use. Recommended: 4 (D2).
+    //irSend = new irSend(kIrLed);         // Set the GPIO to be used to sending the message.
+    //irSend->begin();
     
     createSubscribeOrNot(&_humi, "/b26/umidade", MQTT_PUBLISH);
     createSubscribeOrNot(&_porta, "/b26/porta", MQTT_SUBSCRIBE);
@@ -174,11 +174,11 @@ void MQTTManager::ac_Callback(char *data, uint16_t len) {
 
     if (comando == "1") {
       uint16_t liga_ac[59] = {8450,4200, 600,1550, 600,500, 600,500, 600,500, 550,1600, 600,500, 600,500, 600,500, 550,550, 550,500, 600,500, 600,500, 600,500, 550,550, 550,550, 550,500, 600,500, 600,500, 600,1550, 600,1600, 550,550, 550,550, 550,1600, 600,500, 550,550, 550,1600, 600,500, 600,1600, 550};  // LG 8800325
-      irSend->sendRaw(liga_ac, 59, 38);  // Send a raw data capture at 38kHz.
+      //irSend->sendRaw(liga_ac, 59, 38);  // Send a raw data capture at 38kHz.
     }
     else if (comando == "0"){
       uint16_t desliga_ac[59] = {8450,4200, 600,1600, 550,500, 600,500, 600,500, 600,1600, 550,500, 600,500, 600,500, 600,1600, 550,1600, 600,500, 550,550, 550,500, 600,500, 600,500, 600,500, 550,550, 550,550, 550,500, 600,500, 600,500, 600,1550, 600,500, 600,1600, 550,550, 550,500, 600,500, 600,1600, 550};  // LG 88C0051
-      irSend->sendRaw(desliga_ac, 59, 38);  // Send a raw data capture at 38kHz.
+      //irSend->sendRaw(desliga_ac, 59, 38);  // Send a raw data capture at 38kHz.
     }
 }
 void MQTTManager::luzCallback(char *data, uint16_t len) {
@@ -186,6 +186,18 @@ void MQTTManager::luzCallback(char *data, uint16_t len) {
     Serial.print("Comando para a iluminação: ");
     Serial.println(comando);
 
+    if (comando == "1" and analogRead(A0) > 300) {
+        saida_luz = !saida_luz;
+        digitalWrite(PINO_LUZ, saida_luz);
+    }
+    else if (comando == "0" and analogRead(A0) < 300) {
+        saida_luz = !saida_luz;
+        digitalWrite(PINO_LUZ, saida_luz);
+    }
+
+
+    
+    /*
     if (comando == "1" and digitalRead(PINO_SENSOR_DE_TENSAO) == 0) {
         saida_luz = !saida_luz;
         digitalWrite(PINO_LUZ, saida_luz);
@@ -194,6 +206,7 @@ void MQTTManager::luzCallback(char *data, uint16_t len) {
         saida_luz = !saida_luz;
         digitalWrite(PINO_LUZ, saida_luz);
     }
+    */
 }
 void MQTTManager::tomadaCallback(char *data, uint16_t len) {
     String comando = data;
